@@ -24,6 +24,7 @@ function Dashboard() {
                     Password: password
                 })
                 if (data?.status == true) {
+                    navigate("/fileslist")
                     window.localStorage.setItem("tokens", data?.result)
                     toast.success(data?.message)
                 } else {
