@@ -12,6 +12,7 @@ import axios from 'axios';
 import constant from '../constant';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { toast } from 'react-toastify';
 
 function Fileslist() {
     const navigate = useNavigate()
@@ -57,6 +58,25 @@ function Fileslist() {
         }
     }
 
+    const deletes = async (id) => {
+        try {
+            const { data } = await axios.post(`${constant.Live_url}/password/delete-data`, {
+                id: id
+            },
+                {
+                    headers: {
+                        Authorization: `Bearer ${window.localStorage.getItem("tokens")}`
+                    }
+                })
+            if (data?.success == true) {
+                toast.success(data?.message)
+                getDatas()
+            }
+        } catch (error) {
+            console.log("🚀 ~ getSingle ~ error:", error)
+        }
+    }
+
     return (
         <div>
             <div style={{ textAlign: 'center' }} > <h1>Password Manager</h1> </div>
@@ -70,6 +90,7 @@ function Fileslist() {
                             <TableCell> <b>Website</b> </TableCell>
                             <TableCell ><b>UserName</b></TableCell>
                             <TableCell ><b>Password</b></TableCell>
+                            <TableCell ><b>Status</b></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -83,6 +104,11 @@ function Fileslist() {
                                 </TableCell>
                                 <TableCell >{row?.username}</TableCell>
                                 <TableCell>{(singleData) && (visible == index) ? singleData : row?.password} {visible == index ? <span onClick={() => { setVisible(""); setVisible(""); console.log("ramesh") }} > <VisibilityIcon /> </span> : <span onClick={() => { setVisible(index); getSingle(row?._id) }}><VisibilityOffIcon /></span>}   </TableCell>
+                                <TableCell>
+                                    <Button variant='contained' onClick={() => { navigate(`/updatelist`, { state: { data: row } }) }} >Update</Button>
+                                    <Button variant='contained' onClick={() => { deletes(row?._id) }} >Delete</Button>
+                                </TableCell>
+
                             </TableRow>
                         ))}
                     </TableBody>
