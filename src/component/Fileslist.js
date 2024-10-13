@@ -13,6 +13,7 @@ import constant from '../constant';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { toast } from 'react-toastify';
+import TextField from '@mui/material/TextField';
 
 function Fileslist() {
     const navigate = useNavigate()
@@ -34,7 +35,7 @@ function Fileslist() {
     }
 
     const [visible, setVisible] = useState(null)
-
+    const [search, setSearch] = useState("")
     const [singleData, setSingleData] = useState()
     useEffect(() => {
         getDatas()
@@ -77,14 +78,37 @@ function Fileslist() {
         }
     }
 
+    const searchData = async () => {
+        try {
+            const { data } = await axios.post(`${constant.Live_url}/password/search-data`, {
+                search: search
+            }, {
+                headers: {
+                    Authorization: `Bearer ${window.localStorage.getItem("tokens")}`
+                }
+            })
+            if (data?.success == true) {
+                setRows(data?.result)
+            }
+        } catch (error) {
+            console.log("🚀 ~ searchData ~ error:", error)
+        }
+    }
+
     return (
         <div>
             <div style={{ textAlign: 'center' }} > <h1>Password Manager</h1> </div>
             <div style={{ textAlign: 'center' }}>
                 <Button variant='contained' onClick={() => { navigate('/createlist') }} >Create Data</Button>
             </div>
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", marginTop: "20px", gap: "15px" }} >
+                <TextField id="outlined-basic" value={search} label="search" variant="outlined" onChange={(e) => { setSearch(e.target.value) }} />
+                <Button variant='contained' onClick={() => { searchData() }} >Search Data</Button>
+                <Button variant='contained' onClick={() => { getDatas(); setSearch("") }} >Reset Data</Button>
+
+            </div>
             <TableContainer component={Paper}>
-                <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+                <Table sx={{ minWidth: 650, marginTop: "20px" }} size="small" aria-label="a dense table">
                     <TableHead>
                         <TableRow>
                             <TableCell> <b>Website</b> </TableCell>
